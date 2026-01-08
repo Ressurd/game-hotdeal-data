@@ -1,0 +1,118 @@
+name: ingest-hot
+
+on:
+  schedule:
+    - cron: "0 0 * * 0,2-6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ingest-pages
+      cancel-in-progress: false
+    env:
+      SOURCE_REPO: Ressurd/steam-hotdeal
+    steps:
+      - name: Checkout data repo
+        uses: actions/checkout@v4
+      - name: Check gh-pages branch
+        id: ghpages
+        run: |
+          if git ls-remote --exit-code origin gh-pages; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Checkout gh-pages
+        if: steps.ghpages.outputs.exists == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          token: ${{ secrets.SOURCE_REPO_TOKEN }}
+          path: source
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: source/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: source
+      - name: Restore cached json
+        if: steps.ghpages.outputs.exists == 'true'
+        run: |
+          mkdir -p source/public/price-history source/public/price-history-usd source/public/detail
+          if [ -d gh-pages/price-history ]; then
+            rsync -a gh-pages/price-history/ source/public/price-history/
+          fi
+          if [ -d gh-pages/price-history-usd ]; then
+            rsync -a gh-pages/price-history-usd/ source/public/price-history-usd/
+          fi
+          if [ -d gh-pages/detail ]; then
+            rsync -a gh-pages/detail/ source/public/detail/
+          fi
+      - name: Run ingest (hot)
+        run: npm run ingest
+        working-directory: source
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          INGEST_MODE: hot
+          STEAM_MAX_HOT: "1000"
+          STEAM_SEARCH_MAX_HOT: "2000"
+          STEAM_DESC_LANGS: "english,koreana"
+          STEAM_FETCH_USD: "1"
+          STEAM_USD_CC: "US"
+          STEAM_FETCH_REVIEWS: "1"
+          STEAM_FETCH_PLAYERS: "0"
+          INGEST_DAILY_MAX: "500"
+          PRICE_HISTORY_DAYS: "180"
+          SNAPSHOT_RETENTION_DAYS: "180"
+          PRICE_HISTORY_STORAGE: "local"
+          PLAYER_HISTORY_STORAGE: "none"
+          LIST_CACHE_STORAGE: "local"
+          LIST_CACHE_LOCALES: "ko,en"
+          LIST_CACHE_LATEST_MIN_DISCOUNT: "0"
+          LIST_CACHE_NEW_DAYS: "90"
+          DETAIL_CACHE_STORAGE: "local"
+          REVIEW_HIGHLIGHT_COUNT: "2"
+          REVIEW_SNIPPET_LIMIT: "150"
+          REVIEW_SAMPLE_SIZE: "20"
+      - name: Prepare Pages output
+        run: |
+          rm -rf pages-out
+          mkdir -p pages-out
+          if [ -d gh-pages ]; then
+            rsync -a --exclude .git gh-pages/ pages-out/
+          fi
+          if [ -d source/public/list-cache ]; then
+            rsync -a --delete source/public/list-cache/ pages-out/list-cache/
+          fi
+          if [ -d source/public/detail ]; then
+            rsync -a --delete source/public/detail/ pages-out/detail/
+          fi
+          if [ -d source/public/price-history ]; then
+            rsync -a --delete source/public/price-history/ pages-out/price-history/
+          fi
+          if [ -d source/public/price-history-usd ]; then
+            rsync -a --delete source/public/price-history-usd/ pages-out/price-history-usd/
+          fi
+          if [ ! -f pages-out/index.html ]; then
+            printf "data\n" > pages-out/index.html
+          fi
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: pages-out
+          clean: true
