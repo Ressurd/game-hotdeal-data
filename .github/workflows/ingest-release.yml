@@ -70,8 +70,8 @@ jobs:
         env:
           INGEST_MODE: release
           INGEST_DATA_SOURCE: "json"
-          STEAM_MAX_RELEASE: "1000"
-          STEAM_SEARCH_MAX_RELEASE: "800"
+          STEAM_MAX_RELEASE: "10000"
+          STEAM_SEARCH_MAX_RELEASE: "20000"
           STEAM_DESC_LANGS: "english,koreana"
           STEAM_FETCH_USD: "1"
           STEAM_USD_CC: "US"
