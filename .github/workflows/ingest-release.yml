@@ -51,7 +51,7 @@ jobs:
       - name: Restore cached json
         if: steps.ghpages.outputs.exists == 'true'
         run: |
-          mkdir -p source/public/price-history source/public/price-history-usd source/public/detail
+          mkdir -p source/public/price-history source/public/price-history-usd source/public/detail source/public/state
           if [ -d gh-pages/price-history ]; then
             rsync -a gh-pages/price-history/ source/public/price-history/
           fi
@@ -61,13 +61,15 @@ jobs:
           if [ -d gh-pages/detail ]; then
             rsync -a gh-pages/detail/ source/public/detail/
           fi
+          if [ -d gh-pages/state ]; then
+            rsync -a gh-pages/state/ source/public/state/
+          fi
       - name: Run ingest (release)
         run: npm run ingest
         working-directory: source
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
           INGEST_MODE: release
+          INGEST_DATA_SOURCE: "json"
           STEAM_MAX_RELEASE: "1000"
           STEAM_SEARCH_MAX_RELEASE: "800"
           STEAM_DESC_LANGS: "english,koreana"
@@ -107,6 +109,9 @@ jobs:
           fi
           if [ -d source/public/price-history-usd ]; then
             rsync -a --delete source/public/price-history-usd/ pages-out/price-history-usd/
+          fi
+          if [ -d source/public/state ]; then
+            rsync -a --delete source/public/state/ pages-out/state/
           fi
           if [ ! -f pages-out/index.html ]; then
             printf "data\n" > pages-out/index.html
