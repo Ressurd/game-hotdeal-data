@@ -75,6 +75,7 @@ jobs:
           STEAM_DESC_LANGS: "english,koreana"
           STEAM_FETCH_USD: "1"
           STEAM_USD_CC: "US"
+          STEAM_FETCH_ATTEMPTS: "6"
           INGEST_USE_FEATURED: "0"
           INGEST_USE_SEEDS: "0"
           STEAM_FETCH_REVIEWS: "1"
