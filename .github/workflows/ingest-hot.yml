@@ -75,6 +75,7 @@ jobs:
           STEAM_DESC_LANGS: "english,koreana"
           STEAM_FETCH_USD: "1"
           STEAM_USD_CC: "US"
+          STEAM_FETCH_ATTEMPTS: "6"
           STEAM_FETCH_REVIEWS: "1"
           STEAM_FETCH_PLAYERS: "0"
           STEAM_FETCH_DISCOUNT_END_HTML: "1"
