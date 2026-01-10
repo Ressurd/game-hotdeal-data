@@ -71,7 +71,7 @@ jobs:
           REVIEW_HIGHLIGHT_COUNT: "2"
           REVIEW_SNIPPET_LIMIT: "150"
           REVIEW_SAMPLE_SIZE: "50"
-          REVIEW_REFRESH_BATCH: "50"
+          REVIEW_REFRESH_ALL: "1"
       - name: Prepare Pages output
         run: |
           rm -rf pages-out
@@ -94,4 +94,3 @@ jobs:
           branch: gh-pages
           folder: pages-out
           clean: true
-
