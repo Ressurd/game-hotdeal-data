@@ -78,7 +78,7 @@ jobs:
           STEAM_FETCH_ATTEMPTS: "6"
           INGEST_USE_FEATURED: "0"
           INGEST_USE_SEEDS: "0"
-          STEAM_FETCH_REVIEWS: "1"
+          STEAM_FETCH_REVIEWS: "0"
           STEAM_FETCH_PLAYERS: "0"
           STEAM_FETCH_DISCOUNT_END_HTML: "1"
           STEAM_DISCOUNT_END_HTML_MAX: "2000"
