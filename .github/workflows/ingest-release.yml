@@ -2,7 +2,7 @@ name: ingest-release
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 15 * * *"
   workflow_dispatch:
 
 permissions:
@@ -70,8 +70,8 @@ jobs:
         env:
           INGEST_MODE: release
           INGEST_DATA_SOURCE: "json"
-          STEAM_MAX_RELEASE: "5000"
-          STEAM_SEARCH_MAX_RELEASE: "10000"
+          STEAM_MAX_RELEASE: "2000"
+          STEAM_SEARCH_MAX_RELEASE: "5000"
           STEAM_DESC_LANGS: "english,koreana"
           STEAM_FETCH_USD: "1"
           STEAM_USD_CC: "US"
@@ -81,10 +81,10 @@ jobs:
           STEAM_FETCH_REVIEWS: "1"
           STEAM_FETCH_PLAYERS: "0"
           STEAM_FETCH_DISCOUNT_END_HTML: "1"
-          STEAM_DISCOUNT_END_HTML_MAX: "10000"
+          STEAM_DISCOUNT_END_HTML_MAX: "2000"
           STEAM_DISCOUNT_END_HTML_KST: "1"
           INGEST_SKIP_RECENT_HOURS: "12"
-          INGEST_SKIP_RECENT_BUFFER: "5000"
+          INGEST_SKIP_RECENT_BUFFER: "2000"
           INGEST_CHECKPOINT_EVERY: "1000"
           PRICE_HISTORY_DAYS: "180"
           SNAPSHOT_RETENTION_DAYS: "180"
