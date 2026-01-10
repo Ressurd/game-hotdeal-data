@@ -2,7 +2,7 @@ name: ingest-reviews
 
 on:
   schedule:
-    - cron: "30 2 * * *"
+    - cron: "30 2,12 * * *"
   workflow_dispatch:
 
 permissions:
