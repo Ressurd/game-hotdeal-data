@@ -2,7 +2,10 @@ name: ingest-dlc
 
 on:
   schedule:
-    - cron: "0 9 * * *"
+    - cron: "50 4 * * *"
+    - cron: "45 8 * * *"
+    - cron: "35 17 * * *"
+    - cron: "35 21 * * *"
   workflow_dispatch:
 
 permissions:
@@ -64,7 +67,7 @@ jobs:
         env:
           INGEST_MODE: dlc
           INGEST_DATA_SOURCE: "json"
-          STEAM_MAX_DLC: "2000"
+          STEAM_MAX_DLC: "500"
           STEAM_FETCH_ATTEMPTS: "6"
           STEAM_DESC_LANGS: "english,koreana"
           STEAM_FETCH_USD: "1"
@@ -73,6 +76,7 @@ jobs:
           STEAM_FETCH_PLAYERS: "0"
           INGEST_SKIP_RECENT_HOURS: "24"
           INGEST_SKIP_RECENT_BUFFER: "2000"
+          INGEST_DLC_NONDISCOUNT_DAYS: "7"
           DETAIL_CACHE_STORAGE: "local"
           LIST_CACHE_STORAGE: "none"
           PRICE_HISTORY_STORAGE: "none"
