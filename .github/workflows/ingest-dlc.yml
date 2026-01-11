@@ -1,10 +1,11 @@
-name: ingest-hot
+name: ingest-dlc
 
 on:
   schedule:
-    - cron: "0 0,6 * * *"
-    - cron: "45 12 * * *"
-    - cron: "50 18 * * *"
+    - cron: "50 4 * * *"
+    - cron: "45 8 * * *"
+    - cron: "35 17 * * *"
+    - cron: "35 21 * * *"
   workflow_dispatch:
 
 permissions:
@@ -53,56 +54,33 @@ jobs:
       - name: Restore cached json
         if: steps.ghpages.outputs.exists == 'true'
         run: |
-          mkdir -p source/public/price-history source/public/price-history-usd source/public/detail source/public/state
-          if [ -d gh-pages/price-history ]; then
-            rsync -a gh-pages/price-history/ source/public/price-history/
-          fi
-          if [ -d gh-pages/price-history-usd ]; then
-            rsync -a gh-pages/price-history-usd/ source/public/price-history-usd/
-          fi
+          mkdir -p source/public/detail source/public/state
           if [ -d gh-pages/detail ]; then
             rsync -a gh-pages/detail/ source/public/detail/
           fi
           if [ -d gh-pages/state ]; then
             rsync -a gh-pages/state/ source/public/state/
           fi
-      - name: Run ingest (hot)
+      - name: Run ingest (dlc)
         run: npm run ingest
         working-directory: source
         env:
-          INGEST_MODE: hot
+          INGEST_MODE: dlc
           INGEST_DATA_SOURCE: "json"
-          STEAM_MAX_HOT: "2000"
-          STEAM_SEARCH_MAX_HOT: "5000"
+          STEAM_MAX_DLC: "500"
+          STEAM_FETCH_ATTEMPTS: "6"
           STEAM_DESC_LANGS: "english,koreana"
           STEAM_FETCH_USD: "1"
           STEAM_USD_CC: "US"
-          STEAM_FETCH_ATTEMPTS: "6"
-          STEAM_FETCH_REVIEWS: "1"
+          STEAM_FETCH_REVIEWS: "0"
           STEAM_FETCH_PLAYERS: "0"
-          STEAM_FETCH_DISCOUNT_END_HTML: "1"
-          STEAM_DISCOUNT_END_HTML_MAX: "2000"
-          STEAM_DISCOUNT_END_HTML_KST: "1"
-          STEAM_FETCH_TAGS_HTML: "1"
-          STEAM_TAGS_HTML_MAX: "2000"
           INGEST_SKIP_RECENT_HOURS: "24"
           INGEST_SKIP_RECENT_BUFFER: "2000"
-          INGEST_INCLUDE_LOCALIZE: "1"
-          INGEST_LOCALIZE_MAX: "100"
-          INGEST_CHECKPOINT_EVERY: "1000"
-          INGEST_DAILY_MAX: "500"
-          PRICE_HISTORY_DAYS: "730"
-          SNAPSHOT_RETENTION_DAYS: "730"
-          PRICE_HISTORY_STORAGE: "local"
-          PLAYER_HISTORY_STORAGE: "none"
-          LIST_CACHE_STORAGE: "local"
-          LIST_CACHE_LOCALES: "ko,en"
-          LIST_CACHE_LATEST_MIN_DISCOUNT: "0"
-          LIST_CACHE_NEW_DAYS: "90"
+          INGEST_DLC_NONDISCOUNT_DAYS: "7"
           DETAIL_CACHE_STORAGE: "local"
-          REVIEW_HIGHLIGHT_COUNT: "2"
-          REVIEW_SNIPPET_LIMIT: "150"
-          REVIEW_SAMPLE_SIZE: "50"
+          LIST_CACHE_STORAGE: "none"
+          PRICE_HISTORY_STORAGE: "none"
+          PLAYER_HISTORY_STORAGE: "none"
       - name: Prepare Pages output
         run: |
           rm -rf pages-out
@@ -110,17 +88,8 @@ jobs:
           if [ -d gh-pages ]; then
             rsync -a --exclude .git gh-pages/ pages-out/
           fi
-          if [ -d source/public/list-cache ]; then
-            rsync -a --delete source/public/list-cache/ pages-out/list-cache/
-          fi
           if [ -d source/public/detail ]; then
             rsync -a --delete source/public/detail/ pages-out/detail/
-          fi
-          if [ -d source/public/price-history ]; then
-            rsync -a --delete source/public/price-history/ pages-out/price-history/
-          fi
-          if [ -d source/public/price-history-usd ]; then
-            rsync -a --delete source/public/price-history-usd/ pages-out/price-history-usd/
           fi
           if [ -d source/public/state ]; then
             rsync -a --delete source/public/state/ pages-out/state/
